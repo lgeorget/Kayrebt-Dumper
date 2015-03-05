@@ -6,8 +6,9 @@ FUNCTIONS="functions"
 SOURCES="sources"
 TREE="/home/lgeorget/Documents/THESE/linux/"
 CLEAN=1
+VERSION="master"
 
-while getopts ":hf:s:k" opt; do
+while getopts ":hf:s:kV:" opt; do
   case $opt in
     h)
 echo <<EOF
@@ -31,6 +32,8 @@ default value:
 	default value is "$TREE".
 	-k: this flags when it is set tells $0 not to clean remove the temporary
 	files after extracting activity diagrams (mnemonics: "keep").
+	-V: this parameters tells $0 to checkout a specific version of the
+	kernel. Any commit number or version tag is fine. The default is 'master'.
 EOF
       exit 0
       ;;
@@ -43,16 +46,19 @@ EOF
       exit 1
       ;;
     f)
-      FUNCTIONS=$OPTARG
+      FUNCTIONS="$OPTARG"
       ;;
     s)
-      SOURCES=$OPTARG
+      SOURCES="$OPTARG"
       ;;
     t)
-      TREE=$OPTARG
+      TREE="$OPTARG"
       ;;
     k)
       CLEAN=0
+      ;;
+    V)
+      VERSION="$OPTARG"
       ;;
   esac
 done
@@ -82,10 +88,18 @@ fi
 
 [[ error == 1 ]] && exit 2
 
+OLDDIR=$(pwd)
+cd $TREE
+git pull
+git checkout $VERSION || exit 3
+rm .config
+make defconfig || exit 4
+cd "$OLDDIR"
+
 cp "$FUNCTIONS" "$TREE"/graph.list
 while read sourcefile
 do
-	make -C "$TREE" "${sourcefile/%c/o}"
+	make CFLAGS_KERNEL="-fplugin=cgrapher4gcc -x c -fplugin-arg-cgrapher4gcc-fn_list=graph.list"  -C "$TREE" "${sourcefile/%c/o}"
 	cp "$TREE"/"$sourcefile".dump .
 done < "$SOURCES"
 
