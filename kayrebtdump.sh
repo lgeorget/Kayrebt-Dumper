@@ -92,16 +92,17 @@ OLDDIR=$(pwd)
 tree_clone=$(mktemp -d)
 git clone $TREE $tree_clone
 cd $tree_clone
+git pull origin master
 git checkout $VERSION || exit 3
 rm -f .config
 make defconfig || exit 4
 cd "$OLDDIR"
 
-cp "$FUNCTIONS" "$TREE"/graph.list
+cp "$FUNCTIONS" "$tree_clone"/graph.list
 while read sourcefile
 do
-	make CFLAGS_KERNEL="-fplugin=cgrapher4gcc -x c -fplugin-arg-cgrapher4gcc-fn_list=graph.list"  -C "$TREE" "${sourcefile/%c/o}"
-	cp "$TREE"/"$sourcefile".dump .
+	make CFLAGS_KERNEL="-fplugin=cgrapher4gcc -x c -fplugin-arg-cgrapher4gcc-fn_list=graph.list"  -C "$tree_clone" "${sourcefile/%c/o}"
+	cp "$tree_clone"/"$sourcefile".dump .
 done < "$SOURCES"
 
 for i in *.dump
