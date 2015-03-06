@@ -16,7 +16,7 @@ while (<>)
 	}
 	elsif (/digraph d/ ... /^\}$/)
 	{
-		print $output $_ if ($output);
+		print $output $_ if $output;
 	}
 	else
 	{
