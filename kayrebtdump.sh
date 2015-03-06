@@ -89,10 +89,11 @@ fi
 [[ $error == 1 ]] && exit 2
 
 OLDDIR=$(pwd)
-cd $TREE
-git fetch
+tree_clone=$(mktemp -d)
+git clone $TREE $tree_clone
+cd $tree_clone
 git checkout $VERSION || exit 3
-rm .config
+rm -f .config
 make defconfig || exit 4
 cd "$OLDDIR"
 
@@ -116,4 +117,6 @@ if [[ $CLEAN == 1 ]]
 then
 	find \( -name '*.dump' -o -name '*.dot' \) -exec rm -f {} \+
 fi
+
+rm -rf $tree_clone
 
