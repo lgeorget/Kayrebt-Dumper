@@ -11,7 +11,7 @@ VERSION="master"
 while getopts ":hf:s:kV:" opt; do
   case $opt in
     h)
-echo <<EOF
+cat <<EOF
 Usage: $0 -f <functions list> -s <source files list> -t <linux source tree path>
 
 $0 is used to extract activity diagrams from functions of the Linux kernel code
@@ -86,11 +86,11 @@ then
 	error=1
 fi
 
-[[ error == 1 ]] && exit 2
+[[ $error == 1 ]] && exit 2
 
 OLDDIR=$(pwd)
 cd $TREE
-git pull
+git fetch
 git checkout $VERSION || exit 3
 rm .config
 make defconfig || exit 4
