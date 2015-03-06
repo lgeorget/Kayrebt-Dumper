@@ -18,8 +18,14 @@ those functions (in order to avoid compiling the entire kernel to extract the
 graph of one or two functions).
 
 Parameters:
-	-s : the file containing the list of source files to compile
-	-f : the file containing the list of functions to graph
+	-s <path>: the file containing the list of source files to compile
+	(default: "sources")
+	-f <path>: the file containing the list of functions to graph
+	(default: "functions")
+	-k: do not remove temporary files at the end of the execution
+	-t <path>: select a different sources tree than the default one
+	-V <commit>: select a specific commit in the kernel tree for diagram
+	extraction (default: "master")
 
 Outputs
 -------
