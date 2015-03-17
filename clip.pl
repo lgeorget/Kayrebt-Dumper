@@ -5,14 +5,17 @@ use strict;
 use warnings;
 
 my $function;
-my $output;
+my $output = undef;
 
 while (<>)
 {
 	if (/^Function (\w+)/)
 	{
 		$function = $1;
-		open($output, ">$function.dot") or warn "Couldn't open output file for $function";
+		unless open($output, ">$function.dot") {
+			warn "Couldn't open output file for $function";
+			$output = undef;
+		}
 	}
 	elsif (/digraph d/ ... /^\}$/)
 	{
@@ -21,6 +24,7 @@ while (<>)
 	else
 	{
 		close $output if $output;
+		$output = undef;
 	}
 }
 0;
