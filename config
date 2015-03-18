@@ -1,0 +1,7 @@
+general:
+  categories:
+    1: color=red
+
+fs/read_write.c:
+  functions: ["vfs_read","SYSC_read"]
+
