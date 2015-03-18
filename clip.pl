@@ -12,7 +12,7 @@ while (<>)
 	if (/^Function (\w+)/)
 	{
 		$function = $1;
-		unless open($output, ">$function.dot") {
+		unless (open($output, ">$function.dot")) {
 			warn "Couldn't open output file for $function";
 			$output = undef;
 		}
