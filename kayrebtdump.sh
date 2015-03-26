@@ -105,7 +105,7 @@ cp "$CONFIG" "$tree_clone/config"
 
 while read sourcefile
 do
-	make CFLAGS_KERNEL="-fplugin=cgrapher4gcc -x c"  -C "$tree_clone" "${sourcefile/%c/o}"
+	make CFLAGS_KERNEL="-fplugin=cgrapher4gcc -x c"  -C "$tree_clone" "${sourcefile/%.c/.o}"
 	cp "$tree_clone"/"$sourcefile".dump .
 done < "$SOURCES"
 
@@ -115,7 +115,7 @@ do
 done
 for i in *.dot
 do
-	dot $i -Tpng > ${i/%dot/png}
+	dot $i -Tpng > ${i/%.dot/.png}
 done
 
 if [[ $CLEAN == 1 ]]
