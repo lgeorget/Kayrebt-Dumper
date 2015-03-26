@@ -8,7 +8,7 @@ TREE="/home/lgeorget/Documents/THESE/linux/"
 CLEAN=1
 VERSION="master"
 
-while getopts ":hf:s:kV:" opt; do
+while getopts ":hs:kV:c:" opt; do
   case $opt in
     h)
 cat <<EOF
