@@ -96,8 +96,8 @@ tree_clone=$(mktemp -d)
 git clone $TREE $tree_clone
 cd $tree_clone
 git remote add linux  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-git fetch linux
-git checkout $VERSION || exit 3
+git fetch linux $VERSION
+git checkout FETCH_HEAD || exit 3
 rm -f .config
 make defconfig || exit 4
 cd "$OLDDIR"
