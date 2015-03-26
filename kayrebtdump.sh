@@ -95,7 +95,7 @@ OLDDIR=$(pwd)
 tree_clone=$(mktemp -d)
 git clone $TREE $tree_clone
 cd $tree_clone
-git add remote linux  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+git remote add linux  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 git fetch linux
 git checkout $VERSION || exit 3
 rm -f .config
