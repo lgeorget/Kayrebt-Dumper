@@ -111,7 +111,8 @@ cd "$OLDDIR"
 cp "$CONFIG" "$tree_clone/config"
 
 make CFLAGS_KERNEL="-fplugin=cgrapher4gcc -x c"  -C "$tree_clone" bzImage
-find $tree_clone -name '*.c.dump' | tar cvf dump-all.tar --transform "s/"${tree_clone//\//\\\/}"/linux-"${VERSION//\//\\\/}"/"-T -
+stripped_tree_clone=${tree_clone#\/}
+find $tree_clone -name '*.c.dump' | tar cf dump-linux-"$VERSION".tar --transform "s/"${stripped_tree_clone//\//\\\/}"/linux-"${VERSION//\//_}"/" -T -
 
 # TODO : make all of this work somehow
 #
