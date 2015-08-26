@@ -7,16 +7,18 @@ CONFIG="config"
 TREE="/home/lgeorget/Documents/THESE/linux/"
 CLEAN=1
 VERSION="master"
+NO_CLONE=0
 
-while getopts ":hs:kV:c:" opt; do
+while getopts ":hs:kV:c:N" opt; do
   case $opt in
     h)
 cat <<EOF
-Usage: $0 -s <source files list> -c <config file> -t <linux source tree path>
+Usage: $0 [-s [<source files list>]] [-c [<config file>]]
+          [-t [<linux source tree path>]] [-k] [-V <tag or commit>] [-N]
 
 $0 is used to extract activity diagrams from functions of the Linux kernel code
 base.
-The options '-s' and '-t' take exactly one argument, which have a
+The options '-s', '-c'  and '-t' take exactly one argument, which has a
 default value:
 	-s <source files list>: this parameter is the path of a file
 	containing the list of files to compile, one per line.
@@ -44,11 +46,15 @@ default value:
 	files after extracting activity diagrams (mnemonics: "keep").
 	-V: this parameters tells $0 to checkout a specific version of the
 	kernel. Any commit number or version tag is fine. The default is 'master'.
+	-N: do not clone the kernel source tree provided by the -t option but use
+	it directly. Of course, it must be a local path. You may want to 'make
+	clean' it first as $0 will not do it for you.
 EOF
       exit 0
       ;;
     \?)
-      echo "Usage: $0 -s <source files list>" >&2
+      echo "Usage: $0 [-s [<source files list>]] [-c [<config file>]]" >&2
+           "       [-t [<linux source tree path>]] [-k] [-V <tag or commit>] [-N]" >&2
       exit 1
       ;;
     :)
@@ -70,6 +76,9 @@ EOF
     V)
       VERSION="$OPTARG"
       ;;
+    N)
+      NO_CLONE=1
+      ;;
   esac
 done
 
@@ -81,9 +90,10 @@ then
 	error=1
 fi
 
-if [[ ! -e $TREE ]] || [[ ! -d $TREE ]] || [[ ! -x $TREE ]]
+if [[ $NO_CLONE ]] && ([[ ! -e $TREE ]] || [[ ! -d $TREE ]] || [[ ! -x $TREE ]])
 then
-	echo "The linux source tree path \"$TREE\" is invalid." >&2
+	echo "You want to use \"$TREE\" as the source tree but it's either not" >&2
+	echo "a local path or a local path that is not accessible" >&2
 	echo "Do you have sufficient permission?" >&2
 	echo "See $0 -h for help." >&2
 	error=1
@@ -92,11 +102,19 @@ fi
 [[ $error == 1 ]] && exit 2
 
 OLDDIR=$(pwd)
-tree_clone=$(mktemp -d)
-git clone $TREE $tree_clone
-cd $tree_clone
-git remote add linux  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-git fetch linux $VERSION
+tree_clone=""
+if [[ $NO_CLONE == 1 ]]
+then
+	tree_clone=$TREE
+	cd $tree_clone
+	git fetch origin $VERSION
+else
+	tree_clone=$(mktemp -d)
+	git clone $TREE $tree_clone
+	cd $tree_clone
+	git remote add linux  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+	git fetch linux $VERSION
+fi
 git checkout FETCH_HEAD || exit 3
 rm -f .config
 make defconfig || exit 4
@@ -109,19 +127,8 @@ do
 	cp "$tree_clone"/"$sourcefile".dump .
 done < "$SOURCES"
 
-for i in *.dump
-do
-	./clip.pl < $i
-done
-for i in *.dot
-do
-	dot $i -Tpng > ${i/%.dot/.png}
-done
-
 if [[ $CLEAN == 1 ]]
 then
-	find \( -name '*.dump' -o -name '*.dot' \) -exec rm -f {} \+
+	rm -rf $tree_clone
 fi
-
-rm -rf $tree_clone
 
