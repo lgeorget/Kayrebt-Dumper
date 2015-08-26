@@ -2,7 +2,6 @@
 
 set -x
 
-SOURCES="sources"
 CONFIG="config"
 TREE="/home/lgeorget/Documents/THESE/linux/"
 CLEAN=1
@@ -12,18 +11,12 @@ while getopts ":hs:kV:c:" opt; do
   case $opt in
     h)
 cat <<EOF
-Usage: $0 -s <source files list> -c <config file> -t <linux source tree path>
+Usage: $0 -c <config file> -t <linux source tree path>
 
 $0 is used to extract activity diagrams from functions of the Linux kernel code
 base.
 The options '-s' and '-t' take exactly one argument, which have a
 default value:
-	-s <source files list>: this parameter is the path of a file
-	containing the list of files to compile, one per line.
-	The files must be given as path relative to the kernel top directory.
-	The functions of the functions list should be a subset of the functions
-	implemented in those files. Otherwise, some diagrams will be missing.
-	The default value is "$SOURCES".
 	-c <config file>: this parameter is the path of the config file.
 	The configuration is written in YAML. The configuration should look like
 	the following:
@@ -55,9 +48,6 @@ EOF
       echo "Option -$OPTARG requires an argument." >&2
       exit 1
       ;;
-    s)
-      SOURCES="$OPTARG"
-      ;;
     c)
       CONFIG="$OPTARG"
       ;;
@@ -74,13 +64,6 @@ EOF
 done
 
 error=0
-if [[ ! -e $SOURCES ]] || [[ ! -r $SOURCES ]]
-then
-	echo "The source files list \"$SOURCES\" does not exist or is not readable." >&2
-	echo "See $0 -h for help." >&2
-	error=1
-fi
-
 if [[ ! -e $CONFIG ]] || [[ ! -r $CONFIG ]]
 then
 	echo "The configuration file \"$CONFIG\" does not exist or is not readable." >&2
