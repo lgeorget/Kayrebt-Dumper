@@ -72,7 +72,7 @@ EOF
       NO_CLONE=1
       ;;
     D)
-      DB_PATH="$OPTARG"
+      DB_PATH=$(realpath "$OPTARG")
       ;;
   esac
 done
@@ -133,7 +133,7 @@ find $tree_clone -name '*.c.dump' | tar cf dump-linux-"$VERSION".tar --transform
 if [[ "$DB_PATH" != "" ]]
 then
 	cd "$tree_clone"
-	extract_global_symbols.pl > $DB_PATH
+	krextract | sqlite3 $DB_PATH
 	cd "$OLDDIR"
 fi
 
