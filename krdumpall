@@ -1,9 +1,7 @@
 #!/bin/bash
 
-set -x
-
 CONFIG="config"
-TREE="/home/lgeorget/Documents/THESE/linux/"
+TREE="git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
 CLEAN=1
 VERSION="master"
 DB_PATH=""
@@ -87,13 +85,16 @@ then
 	error=1
 fi
 
-if [[ $NO_CLONE ]] && ([[ ! -e $TREE ]] || [[ ! -d $TREE ]] || [[ ! -x $TREE ]])
+if [[ $NO_CLONE == 1 ]]
 then
-	echo "You want to use \"$TREE\" as the source tree but it's either not" >&2
-	echo "a local path or a local path that is not accessible" >&2
-	echo "Do you have sufficient permission?" >&2
-	echo "See $0 -h for help." >&2
-	error=1
+	if [[ ! -e $TREE ]] || [[ ! -d $TREE ]] || [[ ! -x $TREE ]]
+	then
+		echo "You want to use \"$TREE\" as the source tree but it's either not" >&2
+		echo "a local path or a local path that is not accessible" >&2
+		echo "Do you have sufficient permission?" >&2
+		echo "See $0 -h for help." >&2
+		error=1
+	fi
 fi
 
 [[ $error == 1 ]] && exit 2
