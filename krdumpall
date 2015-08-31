@@ -105,7 +105,9 @@ if [[ $NO_CLONE == 1 ]]
 then
 	tree_clone=$TREE
 	cd $tree_clone
-	git fetch origin $VERSION
+	git remote add linux  git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 2>/dev/null ||
+		echo "Fetching from remote 'linux'! If there is an error, make sure this points to a mirror of the Linux kernel git repo."
+	git fetch linux $VERSION
 else
 	tree_clone=$(mktemp -d)
 	git clone $TREE $tree_clone
