@@ -126,7 +126,7 @@ fi
 
 cd "$OLDDIR"
 cp "$CONFIG" "$tree_clone/config"
-make CFLAGS_KERNEL="-fplugin=cgrapher4gcc -x c"  -C "$tree_clone" bzImage
+make CFLAGS_KERNEL="-fplugin=kayrebt_extractor -x c"  -C "$tree_clone" bzImage
 stripped_tree_clone=${tree_clone#\/}
 find $tree_clone -name '*.c.dump' | tar cf dump-linux-"$VERSION".tar --transform "s/"${stripped_tree_clone//\//\\\/}"/linux-"${VERSION//\//_}"/" -T -
 
