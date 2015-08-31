@@ -120,10 +120,7 @@ rm -f .config
 make defconfig || exit 4
 if [[ "$DB_PATH" != "" ]]
 then
-cat <<EOF >>.config
-CONFIG_DEBUG_INFO_SPLIT=y
-CONFIG_DEBUG_INFO_DWARF4=y
-EOF
+scripts/config -e 'DEBUG_INFO' -e 'DEBUG_INFO_SPLIT'
 fi
 
 cd "$OLDDIR"
