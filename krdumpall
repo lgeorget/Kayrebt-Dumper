@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 CONFIG="config"
 TREE="git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
 CLEAN=1
@@ -120,14 +122,15 @@ rm -f .config
 make defconfig || exit 4
 if [[ "$DB_PATH" != "" ]]
 then
-scripts/config -e 'DEBUG_INFO' -e 'DEBUG_INFO_SPLIT'
+scripts/config -e 'DEBUG_INFO' -e 'DEBUG_INFO_SPLIT' || exit 4
 fi
 
 cd "$OLDDIR"
 cp "$CONFIG" "$tree_clone/config"
-make CFLAGS_KERNEL="-fplugin=kayrebt_extractor -x c"  -C "$tree_clone" bzImage
+make CFLAGS_KERNEL="-fplugin=kayrebt_extractor -x c"  -C "$tree_clone" bzImage || exit 5
 stripped_tree_clone=${tree_clone#\/}
-find $tree_clone -name '*.c.dump' | tar cf dump-linux-"$VERSION".tar --transform "s/"${stripped_tree_clone//\//\\\/}"/linux-"${VERSION//\//_}"/" -T -
+find $tree_clone -name 'SYSC_*' -exec bash -c 'ln -s $(basename 1) ${1//SYSC_/sys_}' bash  '{}' \; #special handling for system calls
+find $tree_clone -name '*.c.dump' | tar cf dump-linux-"$VERSION".tar --transform "s/"${stripped_tree_clone//\//\\\/}"/linux-"${VERSION//\//_}"\//" -T -
 
 if [[ "$DB_PATH" != "" ]]
 then
