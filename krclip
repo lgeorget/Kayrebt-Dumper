@@ -20,7 +20,7 @@ while (<STDIN>)
 		$function = $1;
 		open($output, ">", "$newdir/$function.dot") or warn "Couldn't open output file for $function";
 	}
-	elsif (/digraph d/ ... /^\}$/)
+	elsif (/digraph \w+/ ... /^\}$/)
 	{
 		print $output $_ if ($output);
 	}
